@@ -5,6 +5,7 @@ import "time"
 type LogProduk struct {
 	ID            int       `gorm:"primaryKey;column:id;type:int;autoIncrement"`
 	ProdukID      int       `gorm:"column:id_produk;type:int;not null"`
+	DetailTrxID   int       `gorm:"column:id_detail_trx;type:int;not null"`
 	NamaProduk    string    `gorm:"column:nama_produk;type:varchar(255);not null"`
 	Slug          string    `gorm:"column:slug;type:varchar(255);not null"`
 	HargaReseller string    `gorm:"column:harga_reseller;type:varchar(255);not null"`
@@ -17,5 +18,5 @@ type LogProduk struct {
 
 	// Relasi
 	Produk    Produk    `gorm:"foreignKey:ProdukID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	DetailTrx DetailTrx `gorm:"foreignKey:LogID;references:ID;"`
+	DetailTrx DetailTrx `gorm:"foreignKey:DetailTrxID;references:ID;"`
 }
