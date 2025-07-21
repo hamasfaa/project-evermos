@@ -5,7 +5,7 @@ import "time"
 type User struct {
 	ID           int       `gorm:"primaryKey;column:id;type:int;autoIncrement"`
 	Nama         string    `gorm:"column:nama;type:varchar(255);not null"`
-	Kata_Sandi   string    `gorm:"column:kata_sandi;type:varchar(255);not null"`
+	KataSandi    string    `gorm:"column:kata_sandi;type:varchar(255);not null"`
 	Notelp       string    `gorm:"column:notelp;type:varchar(20);unique;not null"`
 	TanggalLahir string    `gorm:"column:tanggal_lahir;type:date"`
 	JenisKelamin string    `gorm:"column:jenis_kelamin;type:varchar(255)"`
