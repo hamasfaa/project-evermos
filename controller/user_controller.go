@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/hamasfaa/project-evermos/common"
 	"github.com/hamasfaa/project-evermos/configuration"
+	"github.com/hamasfaa/project-evermos/middleware"
 	"github.com/hamasfaa/project-evermos/model"
 	"github.com/hamasfaa/project-evermos/service"
 	"github.com/hamasfaa/project-evermos/service/impl"
@@ -24,6 +25,7 @@ type UserController struct {
 func (controller UserController) Route(app *fiber.App) {
 	app.Post("/api/v1/auth/register", controller.RegisterUser)
 	app.Post("/api/v1/auth/login", controller.LoginUser)
+	app.Get("/api/v1/user", middleware.AuthenticateJWT(false, controller.Config), controller.Me)
 }
 
 func (controller UserController) RegisterUser(c *fiber.Ctx) error {
@@ -122,5 +124,35 @@ func (controller UserController) LoginUser(c *fiber.Ctx) error {
 		"message": "Succeed to POST data",
 		"errors":  nil,
 		"data":    userResponse,
+	})
+}
+
+func (controller UserController) Me(c *fiber.Ctx) error {
+	noTelp, ok := c.Locals("noTelp").(string)
+
+	if !ok || noTelp == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"status":  false,
+			"message": "Unauthorized",
+			"errors":  []string{"Invalid user data"},
+			"data":    nil,
+		})
+	}
+
+	meResponse, err := controller.UserService.Me(c.Context(), noTelp)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to GET data",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  true,
+		"message": "Succeed to GET data",
+		"errors":  nil,
+		"data":    meResponse,
 	})
 }

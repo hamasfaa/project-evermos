@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hamasfaa/project-evermos/entity"
 	"github.com/hamasfaa/project-evermos/exception"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -48,7 +47,7 @@ func NewDatabase(config Config) *gorm.DB {
 	sqlDB.SetConnMaxLifetime(time.Duration(rand.Int31n(int32(maxPollLifeTime))) * time.Millisecond)
 
 	//autoMigrate
-	err = db.AutoMigrate(&entity.User{}, &entity.Toko{}, &entity.Kategori{}, &entity.Trx{}, &entity.Produk{}, &entity.LogProduk{}, &entity.FotoProduk{}, &entity.DetailTrx{}, &entity.Alamat{})
+	// err = db.AutoMigrate(&entity.User{}, &entity.Toko{}, &entity.Kategori{}, &entity.Trx{}, &entity.Produk{}, &entity.LogProduk{}, &entity.FotoProduk{}, &entity.DetailTrx{}, &entity.Alamat{})
 	exception.PanicLogging(err)
 	return db
 }

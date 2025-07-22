@@ -52,3 +52,23 @@ func (userService *userServiceImpl) LoginUser(ctx context.Context, phone string,
 	}
 	return userEntity, nil
 }
+
+func (userService *userServiceImpl) Me(ctx context.Context, noTelp string) (*model.RegisterModel, error) {
+	userEntity, err := userService.UserRepository.Me(ctx, noTelp)
+	if err != nil {
+		return nil, err
+	}
+
+	meResponse := &model.RegisterModel{
+		Nama:         userEntity.Nama,
+		KataSandi:    userEntity.KataSandi,
+		NoTelp:       userEntity.Notelp,
+		TanggalLahir: userEntity.TanggalLahir.Format("02/01/2006"),
+		Pekerjaan:    userEntity.Pekerjaan,
+		Email:        userEntity.Email,
+		IDProvinsi:   userEntity.IDProvinsi,
+		IDKota:       userEntity.IDKota,
+	}
+
+	return meResponse, nil
+}

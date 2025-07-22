@@ -35,3 +35,14 @@ func (userRepository *userRepositoryImpl) GetByPhone(ctx context.Context, phone 
 
 	return &user, nil
 }
+
+func (userRepository *userRepositoryImpl) Me(ctx context.Context, noTelp string) (*entity.User, error) {
+	var user entity.User
+	err := userRepository.DB.WithContext(ctx).Where("notelp = ?", noTelp).First(&user).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
