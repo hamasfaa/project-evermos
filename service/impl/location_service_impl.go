@@ -63,3 +63,34 @@ func (s *locationServiceImpl) GetCityByID(ctx context.Context, provinceID, cityI
 
 	return nil, fmt.Errorf("city not found")
 }
+
+func (s *locationServiceImpl) GetProvince(ctx context.Context) ([]model.ProvinceModel, error) {
+	resp, err := s.httpClient.Get("https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json")
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var provinces []model.ProvinceModel
+	if err := json.NewDecoder(resp.Body).Decode(&provinces); err != nil {
+		return nil, err
+	}
+
+	return provinces, nil
+}
+
+func (s *locationServiceImpl) GetCities(ctx context.Context, provinceID string) ([]model.CityModel, error) {
+	url := fmt.Sprintf("https://www.emsifa.com/api-wilayah-indonesia/api/regencies/%s.json", provinceID)
+	resp, err := s.httpClient.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var cities []model.CityModel
+	if err := json.NewDecoder(resp.Body).Decode(&cities); err != nil {
+		return nil, err
+	}
+
+	return cities, nil
+}

@@ -25,6 +25,7 @@ func main() {
 
 	// controller
 	userController := controller.NewUserController(&userService, &locationService, config)
+	locationController := controller.NewLocationController(&locationService, config)
 
 	//setup fiber
 	app := fiber.New(configuration.NewFiberConfiguration())
@@ -32,6 +33,7 @@ func main() {
 	app.Use(cors.New())
 
 	userController.Route(app)
+	locationController.Route(app)
 
 	// start app
 	err := app.Listen(config.Get("SERVER.PORT"))
