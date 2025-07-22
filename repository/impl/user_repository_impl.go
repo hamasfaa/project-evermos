@@ -24,3 +24,14 @@ func (userRepository *userRepositoryImpl) Create(ctx context.Context, user *enti
 	}
 	return nil
 }
+
+func (userRepository *userRepositoryImpl) GetByPhone(ctx context.Context, phone string, password string) (*entity.User, error) {
+	var user entity.User
+	err := userRepository.DB.WithContext(ctx).Where("notelp = ? AND kata_sandi = ?", phone, password).First(&user).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}

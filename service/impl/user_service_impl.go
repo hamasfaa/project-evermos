@@ -44,3 +44,11 @@ func (userService *userServiceImpl) RegisterUser(ctx context.Context, user model
 
 	return nil
 }
+
+func (userService *userServiceImpl) LoginUser(ctx context.Context, phone string, password string) (*entity.User, error) {
+	userEntity, err := userService.UserRepository.GetByPhone(ctx, phone, password)
+	if err != nil {
+		return nil, err
+	}
+	return userEntity, nil
+}
