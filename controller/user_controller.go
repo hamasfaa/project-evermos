@@ -11,12 +11,13 @@ import (
 	"github.com/hamasfaa/project-evermos/service/impl"
 )
 
-func NewUserController(userService *service.UserService, config configuration.Config) *UserController {
-	return &UserController{UserService: *userService, Config: config}
+func NewUserController(userService *service.UserService, locationService *service.LocationService, config configuration.Config) *UserController {
+	return &UserController{UserService: *userService, LocationService: *locationService, Config: config}
 }
 
 type UserController struct {
 	service.UserService
+	service.LocationService
 	configuration.Config
 }
 
@@ -85,6 +86,25 @@ func (controller UserController) LoginUser(c *fiber.Ctx) error {
 	}
 	tokenJwtResult := common.GenerateToken(userData.Notelp, userData.IsAdmin, controller.Config)
 
+	provinceData, err := controller.LocationService.GetProvinceByID(c.Context(), userData.IDProvinsi)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to GET data",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+	cityData, err := controller.LocationService.GetCityByID(c.Context(), userData.IDProvinsi, userData.IDKota)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to GET data",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
 	userResponse := model.UserResponse{
 		Nama:         userData.Nama,
 		NoTelp:       userData.Notelp,
@@ -92,8 +112,8 @@ func (controller UserController) LoginUser(c *fiber.Ctx) error {
 		Tentang:      userData.Tentang,
 		Pekerjaan:    userData.Pekerjaan,
 		Email:        userData.Email,
-		IDProvinsi:   userData.IDProvinsi,
-		IDKota:       userData.IDKota,
+		IDProvinsi:   provinceData,
+		IDKota:       cityData,
 		Token:        tokenJwtResult,
 	}
 

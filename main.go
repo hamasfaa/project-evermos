@@ -21,9 +21,10 @@ func main() {
 
 	// service
 	userService := service.NewUserServiceImpl(&userRepository)
+	locationService := service.NewLocationServiceImpl()
 
 	// controller
-	userController := controller.NewUserController(&userService, config)
+	userController := controller.NewUserController(&userService, &locationService, config)
 
 	//setup fiber
 	app := fiber.New(configuration.NewFiberConfiguration())
