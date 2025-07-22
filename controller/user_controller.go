@@ -26,6 +26,7 @@ func (controller UserController) Route(app *fiber.App) {
 	app.Post("/api/v1/auth/register", controller.RegisterUser)
 	app.Post("/api/v1/auth/login", controller.LoginUser)
 	app.Get("/api/v1/user", middleware.AuthenticateJWT(false, controller.Config), controller.Me)
+	app.Put("/api/v1/user", middleware.AuthenticateJWT(false, controller.Config), controller.UpdateUser)
 }
 
 func (controller UserController) RegisterUser(c *fiber.Ctx) error {
@@ -154,5 +155,47 @@ func (controller UserController) Me(c *fiber.Ctx) error {
 		"message": "Succeed to GET data",
 		"errors":  nil,
 		"data":    meResponse,
+	})
+}
+
+func (controller UserController) UpdateUser(c *fiber.Ctx) error {
+	noTelp, ok := c.Locals("noTelp").(string)
+
+	if !ok || noTelp == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"status":  false,
+			"message": "Unauthorized",
+			"errors":  []string{"Invalid user data"},
+			"data":    nil,
+		})
+	}
+
+	var user model.RegisterModel
+	if err := c.BodyParser(&user); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to parse request body",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	user.NoTelp = noTelp
+
+	err := controller.UserService.UpdateUser(c.Context(), noTelp, user)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to update user",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  true,
+		"message": "User updated successfully",
+		"errors":  nil,
+		"data":    nil,
 	})
 }

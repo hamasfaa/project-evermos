@@ -10,4 +10,5 @@ type UserRepository interface {
 	Create(ctx context.Context, user *entity.User) error
 	GetByPhone(ctx context.Context, phone string, password string) (*entity.User, error)
 	Me(ctx context.Context, noTelp string) (*entity.User, error)
+	Update(ctx context.Context, noTelp string, user *entity.User) error
 }

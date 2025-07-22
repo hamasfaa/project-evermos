@@ -46,3 +46,12 @@ func (userRepository *userRepositoryImpl) Me(ctx context.Context, noTelp string)
 
 	return &user, nil
 }
+
+func (userRepository *userRepositoryImpl) Update(ctx context.Context, noTelp string, user *entity.User) error {
+	err := userRepository.DB.WithContext(ctx).Where("notelp = ?", noTelp).Updates(user).Error
+
+	if err != nil {
+		return err
+	}
+	return nil
+}

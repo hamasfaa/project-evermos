@@ -72,3 +72,27 @@ func (userService *userServiceImpl) Me(ctx context.Context, noTelp string) (*mod
 
 	return meResponse, nil
 }
+
+func (userService *userServiceImpl) UpdateUser(ctx context.Context, noTelp string, user model.RegisterModel) error {
+	parseDate, err := time.Parse("02/01/2006", user.TanggalLahir)
+	if err != nil {
+		return ErrInvalidDateFormat
+	}
+
+	userEntity := entity.User{
+		Nama:         user.Nama,
+		Notelp:       user.NoTelp,
+		TanggalLahir: parseDate,
+		Pekerjaan:    user.Pekerjaan,
+		Email:        user.Email,
+		IDProvinsi:   user.IDProvinsi,
+		IDKota:       user.IDKota,
+	}
+
+	err = userService.UserRepository.Update(ctx, noTelp, &userEntity)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
