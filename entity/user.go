@@ -7,7 +7,7 @@ type User struct {
 	Nama         string    `gorm:"column:nama;type:varchar(255);not null"`
 	KataSandi    string    `gorm:"column:kata_sandi;type:varchar(255);not null"`
 	Notelp       string    `gorm:"column:notelp;type:varchar(20);unique;not null"`
-	TanggalLahir string    `gorm:"column:tanggal_lahir;type:date"`
+	TanggalLahir time.Time `gorm:"column:tanggal_lahir;type:date"`
 	JenisKelamin string    `gorm:"column:jenis_kelamin;type:varchar(255)"`
 	Tentang      string    `gorm:"column:tentang;type:text"`
 	Pekerjaan    string    `gorm:"column:pekerjaan;type:varchar(255)"`
