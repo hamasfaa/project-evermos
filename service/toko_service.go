@@ -8,4 +8,5 @@ import (
 
 type TokoService interface {
 	GetMyToko(ctx context.Context, userID int) (*model.MyToko, error)
+	GetTokoByID(ctx context.Context, tokoID int) (*model.TokoModel, error)
 }

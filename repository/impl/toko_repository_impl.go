@@ -39,3 +39,12 @@ func (repo *tokoRepositoryImpl) Create(ctx context.Context, userID int, tokoData
 	}
 	return nil
 }
+
+func (repo *tokoRepositoryImpl) GetByID(ctx context.Context, tokoID int) (*entity.Toko, error) {
+	toko := &entity.Toko{}
+	err := repo.DB.WithContext(ctx).Where("id = ?", tokoID).First(toko).Error
+	if err != nil {
+		return nil, err
+	}
+	return toko, nil
+}

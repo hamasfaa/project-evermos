@@ -31,3 +31,18 @@ func (t *tokoServiceImpl) GetMyToko(ctx context.Context, userID int) (*model.MyT
 	}
 	return tokoData, nil
 }
+
+func (t *tokoServiceImpl) GetTokoByID(ctx context.Context, tokoID int) (*model.TokoModel, error) {
+	toko, err := t.TokoRepository.GetByID(ctx, tokoID)
+	if err != nil {
+		return nil, err
+	}
+
+	tokoModel := &model.TokoModel{
+		ID:       toko.ID,
+		NamaToko: toko.NamaToko,
+		UrlFoto:  toko.UrlFoto,
+	}
+
+	return tokoModel, nil
+}
