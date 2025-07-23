@@ -22,10 +22,12 @@ func main() {
 
 	// service
 	userService := service.NewUserServiceImpl(&userRepository, &tokoRepository)
+	tokoService := service.NewTokoServiceImpl(&tokoRepository)
 	locationService := service.NewLocationServiceImpl()
 
 	// controller
 	userController := controller.NewUserController(&userService, &locationService, config)
+	tokoController := controller.NewTokoController(&tokoService, config)
 	locationController := controller.NewLocationController(&locationService, config)
 
 	//setup fiber
@@ -34,6 +36,7 @@ func main() {
 	app.Use(cors.New())
 
 	userController.Route(app)
+	tokoController.Route(app)
 	locationController.Route(app)
 
 	// start app
