@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/hamasfaa/project-evermos/configuration"
 	"github.com/hamasfaa/project-evermos/middleware"
+	"github.com/hamasfaa/project-evermos/model"
 	"github.com/hamasfaa/project-evermos/service"
 	"gorm.io/gorm"
 )
@@ -22,7 +23,8 @@ type TokoController struct {
 
 func (controller *TokoController) Route(app *fiber.App) {
 	app.Get("/api/v1/toko/my", middleware.AuthenticateJWT(false, controller.Config), controller.MyToko)
-	app.Get("/api/v1/toko/:id_toko", controller.GetTokoByID)
+	app.Get("/api/v1/toko/:id_toko", middleware.AuthenticateJWT(false, controller.Config), controller.GetTokoByID)
+	app.Get("/api/v1/toko", middleware.AuthenticateJWT(false, controller.Config), controller.GetAllTokos)
 }
 
 func (controller *TokoController) MyToko(c *fiber.Ctx) error {
@@ -96,5 +98,48 @@ func (controller *TokoController) GetTokoByID(c *fiber.Ctx) error {
 		"message": "Succeed to GET data",
 		"error":   nil,
 		"data":    toko,
+	})
+}
+
+func (controller *TokoController) GetAllTokos(c *fiber.Ctx) error {
+	pageStr := c.Query("page", "1")
+	limitStr := c.Query("limit", "10")
+	nama := c.Query("nama", "")
+
+	page, err := strconv.Atoi(pageStr)
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil || limit < 1 {
+		limit = 10
+	}
+
+	if limit > 100 {
+		limit = 100
+	}
+
+	paginationRequest := model.FilterModel{
+		Page:  page,
+		Limit: limit,
+		Nama:  nama,
+	}
+
+	tokos, err := controller.TokoService.GetAllTokos(c.Context(), paginationRequest)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to GET data",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  true,
+		"message": "Succeed to GET data",
+		"error":   nil,
+		"data":    tokos,
 	})
 }

@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"math"
 
 	"github.com/hamasfaa/project-evermos/model"
 	"github.com/hamasfaa/project-evermos/repository"
@@ -45,4 +46,37 @@ func (t *tokoServiceImpl) GetTokoByID(ctx context.Context, tokoID int) (*model.T
 	}
 
 	return tokoModel, nil
+}
+
+func (t *tokoServiceImpl) GetAllTokos(ctx context.Context, pagination model.FilterModel) (*model.AllToko, error) {
+	offset := (pagination.Page - 1) * pagination.Limit
+
+	tokos, total, err := t.TokoRepository.GetAll(ctx, offset, pagination.Limit, pagination.Nama)
+	if err != nil {
+		return nil, err
+	}
+	var tokoModels []model.TokoModel
+	for _, toko := range tokos {
+		tokoModels = append(tokoModels, model.TokoModel{
+			ID:       toko.ID,
+			NamaToko: toko.NamaToko,
+			UrlFoto:  toko.UrlFoto,
+		})
+	}
+
+	totalPages := int(math.Ceil(float64(total) / float64(pagination.Limit)))
+	hasNext := pagination.Page < totalPages
+	hasPrev := pagination.Page > 1
+
+	result := &model.AllToko{
+		Data:       tokoModels,
+		TotalItems: total,
+		TotalPages: totalPages,
+		Page:       pagination.Page,
+		Limit:      pagination.Limit,
+		HasNext:    hasNext,
+		HasPrev:    hasPrev,
+	}
+
+	return result, nil
 }

@@ -48,3 +48,24 @@ func (repo *tokoRepositoryImpl) GetByID(ctx context.Context, tokoID int) (*entit
 	}
 	return toko, nil
 }
+
+func (repo *tokoRepositoryImpl) GetAll(ctx context.Context, offset int, limit int, nama string) ([]entity.Toko, int64, error) {
+	var tokos []entity.Toko
+	var total int64
+
+	query := repo.DB.WithContext(ctx).Model(&entity.Toko{})
+
+	if nama != "" {
+		query = query.Where("nama_toko LIKE ?", "%"+nama+"%")
+	}
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	if err := query.Limit(limit).Offset(offset).Find(&tokos).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return tokos, total, nil
+}
