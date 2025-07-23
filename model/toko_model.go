@@ -4,7 +4,7 @@ type MyToko struct {
 	ID       int    `json:"id"`
 	NamaToko string `json:"nama_toko"`
 	UrlFoto  string `json:"url_foto"`
-	UserID   string `json:"user_id"`
+	UserID   int    `json:"user_id"`
 }
 
 type TokoModel struct {
