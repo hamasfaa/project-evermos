@@ -16,7 +16,8 @@ func AuthenticateJWT(requireAdmin bool, config configuration.Config) func(*fiber
 		SuccessHandler: func(ctx *fiber.Ctx) error {
 			user := ctx.Locals("user").(*jwt.Token)
 			claims := user.Claims.(jwt.MapClaims)
-			userID := claims["userID"].(int)
+			userIDFloat := claims["userID"].(float64)
+			userID := int(userIDFloat)
 			noTelp := claims["noTelp"].(string)
 			isAdmin := claims["is_admin"].(bool)
 
