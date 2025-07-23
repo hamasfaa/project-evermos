@@ -18,9 +18,10 @@ func main() {
 
 	// repository
 	userRepository := repository.NewUserRepositoryImpl(database)
+	tokoRepository := repository.NewTokoRepositoryImpl(database)
 
 	// service
-	userService := service.NewUserServiceImpl(&userRepository)
+	userService := service.NewUserServiceImpl(&userRepository, &tokoRepository)
 	locationService := service.NewLocationServiceImpl()
 
 	// controller

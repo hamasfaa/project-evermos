@@ -16,13 +16,13 @@ type userRepositoryImpl struct {
 	DB *gorm.DB
 }
 
-func (userRepository *userRepositoryImpl) Create(ctx context.Context, user *entity.User) error {
+func (userRepository *userRepositoryImpl) Create(ctx context.Context, user *entity.User) (int, error) {
 	err := userRepository.DB.WithContext(ctx).Create(user).Error
 
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return user.ID, nil
 }
 
 func (userRepository *userRepositoryImpl) GetByPhone(ctx context.Context, phone string, password string) (*entity.User, error) {

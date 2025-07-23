@@ -13,12 +13,13 @@ import (
 
 var ErrInvalidDateFormat = errors.New("invalid date format, expected DD/MM/YYYY")
 
-func NewUserServiceImpl(userRepository *repository.UserRepository) service.UserService {
-	return &userServiceImpl{UserRepository: *userRepository}
+func NewUserServiceImpl(userRepository *repository.UserRepository, tokoRepository *repository.TokoRepository) service.UserService {
+	return &userServiceImpl{UserRepository: *userRepository, TokoRepository: *tokoRepository}
 }
 
 type userServiceImpl struct {
 	repository.UserRepository
+	repository.TokoRepository
 }
 
 func (userService *userServiceImpl) RegisterUser(ctx context.Context, user model.RegisterModel) error {
@@ -37,7 +38,18 @@ func (userService *userServiceImpl) RegisterUser(ctx context.Context, user model
 		IDKota:       user.IDKota,
 	}
 
-	err = userService.UserRepository.Create(ctx, &userEntity)
+	userID, err := userService.UserRepository.Create(ctx, &userEntity)
+	if err != nil {
+		return err
+	}
+
+	tokoModel := model.CreateToko{
+		UserID:   userID,
+		NamaToko: user.Nama,
+		UrlFoto:  "",
+	}
+
+	err = userService.TokoRepository.Create(ctx, userID, &tokoModel)
 	if err != nil {
 		return err
 	}
