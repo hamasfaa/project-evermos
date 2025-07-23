@@ -69,3 +69,16 @@ func (repo *tokoRepositoryImpl) GetAll(ctx context.Context, offset int, limit in
 
 	return tokos, total, nil
 }
+
+func (repo *tokoRepositoryImpl) Update(ctx context.Context, tokoData *model.CreateToko, tokoID int) error {
+	toko := &entity.Toko{
+		NamaToko: tokoData.NamaToko,
+		UrlFoto:  tokoData.UrlFoto,
+		UserID:   tokoData.UserID,
+	}
+	err := repo.DB.WithContext(ctx).Where("id = ? AND id_user = ?", tokoID, toko.UserID).Updates(toko).First(toko).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}

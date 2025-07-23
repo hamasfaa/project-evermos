@@ -80,3 +80,11 @@ func (t *tokoServiceImpl) GetAllTokos(ctx context.Context, pagination model.Filt
 
 	return result, nil
 }
+
+func (t *tokoServiceImpl) UpdateToko(ctx context.Context, tokoData model.CreateToko, tokoID int) error {
+	err := t.TokoRepository.Update(ctx, &tokoData, tokoID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -24,10 +24,11 @@ func main() {
 	userService := service.NewUserServiceImpl(&userRepository, &tokoRepository)
 	tokoService := service.NewTokoServiceImpl(&tokoRepository)
 	locationService := service.NewLocationServiceImpl()
+	fileService := service.NewFileServiceImpl()
 
 	// controller
 	userController := controller.NewUserController(&userService, &locationService, config)
-	tokoController := controller.NewTokoController(&tokoService, config)
+	tokoController := controller.NewTokoController(&tokoService, &fileService, config)
 	locationController := controller.NewLocationController(&locationService, config)
 
 	//setup fiber
