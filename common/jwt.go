@@ -9,12 +9,13 @@ import (
 	"github.com/hamasfaa/project-evermos/exception"
 )
 
-func GenerateToken(noTelp string, isAdmin bool, config configuration.Config) string {
+func GenerateToken(noTelp string, isAdmin bool, userID int, config configuration.Config) string {
 	jwtSecret := config.Get("JWT_SECRET_KEY")
 	jwtExpired, err := strconv.Atoi(config.Get("JWT_EXPIRE_MINUTES_COUNT"))
 	exception.PanicLogging(err)
 
 	claims := jwt.MapClaims{
+		"userID":   userID,
 		"noTelp":   noTelp,
 		"is_admin": isAdmin,
 		"exp":      time.Now().Add(time.Minute * time.Duration(jwtExpired)).Unix(),

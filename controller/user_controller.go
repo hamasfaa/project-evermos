@@ -87,7 +87,7 @@ func (controller UserController) LoginUser(c *fiber.Ctx) error {
 			"data":    nil,
 		})
 	}
-	tokenJwtResult := common.GenerateToken(userData.Notelp, userData.IsAdmin, controller.Config)
+	tokenJwtResult := common.GenerateToken(userData.Notelp, userData.IsAdmin, userData.ID, controller.Config)
 
 	provinceData, err := controller.LocationService.GetProvinceByID(c.Context(), userData.IDProvinsi)
 	if err != nil {
