@@ -14,3 +14,9 @@ type AlamatResponse struct {
 	NoTelp       string `json:"no_telp"`
 	DetailAlamat string `json:"detail_alamat"`
 }
+
+type UpdateAlamatModel struct {
+	NamaPenerima string `json:"nama_penerima"`
+	NoTelp       string `json:"no_telp"`
+	DetailAlamat string `json:"detail_alamat"`
+}

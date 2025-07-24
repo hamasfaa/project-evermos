@@ -26,6 +26,7 @@ func (controller AlamatController) Route(app *fiber.App) {
 	app.Get("/api/v1/user/alamat", middleware.AuthenticateJWT(false, controller.Config), controller.GetAlamatByUserID)
 	app.Get("/api/v1/user/alamat/:id", middleware.AuthenticateJWT(false, controller.Config), controller.GetAlamatByID)
 	app.Delete("/api/v1/user/alamat/:id", middleware.AuthenticateJWT(false, controller.Config), controller.DeleteAlamatByID)
+	app.Put("/api/v1/user/alamat/:id", middleware.AuthenticateJWT(false, controller.Config), controller.UpdateAlamatByID)
 }
 
 func (controller AlamatController) CreateAlamat(c *fiber.Ctx) error {
@@ -137,5 +138,37 @@ func (controller AlamatController) DeleteAlamatByID(c *fiber.Ctx) error {
 		"message": "Succeed to DELETE data",
 		"errors":  nil,
 		"data":    nil,
+	})
+}
+
+func (controller AlamatController) UpdateAlamatByID(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	id, _ := strconv.Atoi(idStr)
+	userID := c.Locals("userID").(int)
+
+	var alamatData model.UpdateAlamatModel
+	if err := c.BodyParser(&alamatData); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to UPDATE data",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	if err := controller.alamatService.UpdateAlamatByID(c.Context(), id, userID, &alamatData); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to UPDATE data",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  true,
+		"message": "Succeed to UPDATE data",
+		"errors":  nil,
+		"data":    alamatData,
 	})
 }

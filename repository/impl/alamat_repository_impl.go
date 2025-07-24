@@ -60,3 +60,17 @@ func (alamatRepository *alamatRepositoryImpl) DeleteAlamatByID(ctx context.Conte
 
 	return nil
 }
+
+func (alamatRepository *alamatRepositoryImpl) UpdateAlamatByID(ctx context.Context, id int, userID int, alamatData *entity.Alamat) error {
+	result := alamatRepository.DB.WithContext(ctx).Model(&entity.Alamat{}).Where("id = ? AND id_user = ?", id, userID).Updates(alamatData)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
+}

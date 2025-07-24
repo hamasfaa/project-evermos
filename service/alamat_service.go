@@ -12,4 +12,5 @@ type AlamatService interface {
 	GetAlamatByUserID(ctx context.Context, userID int) ([]model.AlamatResponse, error)
 	GetAlamatByID(ctx context.Context, id int, userID int) (*model.AlamatResponse, error)
 	DeleteAlamatByID(ctx context.Context, id int, userID int) error
+	UpdateAlamatByID(ctx context.Context, id int, userID int, alamatData *model.UpdateAlamatModel) error
 }

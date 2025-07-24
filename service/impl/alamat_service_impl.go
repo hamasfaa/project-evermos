@@ -72,3 +72,17 @@ func (service *alamatServiceImpl) DeleteAlamatByID(ctx context.Context, id int, 
 	}
 	return nil
 }
+
+func (service *alamatServiceImpl) UpdateAlamatByID(ctx context.Context, id int, userID int, alamatData *model.UpdateAlamatModel) error {
+	alamatEntity := &entity.Alamat{
+		NamaPenerima: alamatData.NamaPenerima,
+		Notelp:       alamatData.NoTelp,
+		DetailAlamat: alamatData.DetailAlamat,
+	}
+
+	err := service.AlamatRepository.UpdateAlamatByID(ctx, id, userID, alamatEntity)
+	if err != nil {
+		return err
+	}
+	return nil
+}

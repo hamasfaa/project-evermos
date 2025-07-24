@@ -11,4 +11,5 @@ type AlamatRepository interface {
 	GetAlamatByUserID(ctx context.Context, userID int) ([]entity.Alamat, error)
 	GetAlamatByID(ctx context.Context, id int, userID int) (*entity.Alamat, error)
 	DeleteAlamatByID(ctx context.Context, id int, userID int) error
+	UpdateAlamatByID(ctx context.Context, id int, userID int, alamatData *entity.Alamat) error
 }
