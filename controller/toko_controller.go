@@ -12,8 +12,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewTokoController(tokoService *service.TokoService, fileService *service.FileService, config configuration.Config) TokoController {
-	return TokoController{TokoService: *tokoService, FileService: *fileService, Config: config}
+func NewTokoController(tokoService *service.TokoService, fileService *service.FileService, config configuration.Config) *TokoController {
+	return &TokoController{TokoService: *tokoService, FileService: *fileService, Config: config}
 }
 
 type TokoController struct {
@@ -22,14 +22,14 @@ type TokoController struct {
 	Config      configuration.Config
 }
 
-func (controller *TokoController) Route(app *fiber.App) {
+func (controller TokoController) Route(app *fiber.App) {
 	app.Get("/api/v1/toko/my", middleware.AuthenticateJWT(false, controller.Config), controller.MyToko)
 	app.Get("/api/v1/toko/:id_toko", middleware.AuthenticateJWT(false, controller.Config), controller.GetTokoByID)
 	app.Get("/api/v1/toko", middleware.AuthenticateJWT(false, controller.Config), controller.GetAllTokos)
 	app.Put("/api/v1/toko/:id_toko", middleware.AuthenticateJWT(false, controller.Config), controller.UpdateToko)
 }
 
-func (controller *TokoController) MyToko(c *fiber.Ctx) error {
+func (controller TokoController) MyToko(c *fiber.Ctx) error {
 	userID := c.Locals("userID").(int)
 	toko, err := controller.TokoService.GetMyToko(c.Context(), userID)
 	if err != nil {
@@ -57,7 +57,7 @@ func (controller *TokoController) MyToko(c *fiber.Ctx) error {
 	})
 }
 
-func (controller *TokoController) GetTokoByID(c *fiber.Ctx) error {
+func (controller TokoController) GetTokoByID(c *fiber.Ctx) error {
 	tokoIDstr := c.Params("id_toko")
 	if tokoIDstr == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -103,7 +103,7 @@ func (controller *TokoController) GetTokoByID(c *fiber.Ctx) error {
 	})
 }
 
-func (controller *TokoController) GetAllTokos(c *fiber.Ctx) error {
+func (controller TokoController) GetAllTokos(c *fiber.Ctx) error {
 	pageStr := c.Query("page", "1")
 	limitStr := c.Query("limit", "10")
 	nama := c.Query("nama", "")
@@ -146,7 +146,7 @@ func (controller *TokoController) GetAllTokos(c *fiber.Ctx) error {
 	})
 }
 
-func (controller *TokoController) UpdateToko(c *fiber.Ctx) error {
+func (controller TokoController) UpdateToko(c *fiber.Ctx) error {
 	userID := c.Locals("userID").(int)
 
 	tokoIDstr := c.Params("id_toko")
