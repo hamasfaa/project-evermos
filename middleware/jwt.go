@@ -40,14 +40,14 @@ func AuthenticateJWT(requireAdmin bool, config configuration.Config) func(*fiber
 			if err.Error() == "Missing or malformed JWT" {
 				return c.Status(fiber.StatusBadRequest).JSON(model.GeneralResponse{
 					Status:  false,
-					Message: "Failed to POST data",
+					Message: "Bad Request",
 					Errors:  []string{"Missing or malformed JWT"},
 					Data:    nil,
 				})
 			} else {
 				return c.Status(fiber.StatusUnauthorized).JSON(model.GeneralResponse{
 					Status:  false,
-					Message: "Failed to POST data",
+					Message: "Unauthorized",
 					Errors:  []string{"Expired or invalid JWT"},
 					Data:    nil,
 				})
