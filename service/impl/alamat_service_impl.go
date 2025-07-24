@@ -64,3 +64,11 @@ func (service *alamatServiceImpl) GetAlamatByID(ctx context.Context, id int, use
 
 	return alamatResponse, nil
 }
+
+func (service *alamatServiceImpl) DeleteAlamatByID(ctx context.Context, id int, userID int) error {
+	err := service.AlamatRepository.DeleteAlamatByID(ctx, id, userID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

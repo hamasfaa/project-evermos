@@ -9,6 +9,7 @@ import (
 	"github.com/hamasfaa/project-evermos/middleware"
 	"github.com/hamasfaa/project-evermos/model"
 	"github.com/hamasfaa/project-evermos/service"
+	"gorm.io/gorm"
 )
 
 func NewAlamatController(alamatService *service.AlamatService, config configuration.Config) *AlamatController {
@@ -24,6 +25,7 @@ func (controller AlamatController) Route(app *fiber.App) {
 	app.Post("/api/v1/user/alamat", middleware.AuthenticateJWT(false, controller.Config), controller.CreateAlamat)
 	app.Get("/api/v1/user/alamat", middleware.AuthenticateJWT(false, controller.Config), controller.GetAlamatByUserID)
 	app.Get("/api/v1/user/alamat/:id", middleware.AuthenticateJWT(false, controller.Config), controller.GetAlamatByID)
+	app.Delete("/api/v1/user/alamat/:id", middleware.AuthenticateJWT(false, controller.Config), controller.DeleteAlamatByID)
 }
 
 func (controller AlamatController) CreateAlamat(c *fiber.Ctx) error {
@@ -103,5 +105,37 @@ func (controller AlamatController) GetAlamatByID(c *fiber.Ctx) error {
 		"message": "Succeed to GET data",
 		"errors":  nil,
 		"data":    alamat,
+	})
+}
+
+func (controller AlamatController) DeleteAlamatByID(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	id, _ := strconv.Atoi(idStr)
+	userID := c.Locals("userID").(int)
+
+	if err := controller.alamatService.DeleteAlamatByID(c.Context(), id, userID); err != nil {
+
+		if err == gorm.ErrRecordNotFound {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"status":  false,
+				"message": "Failed to DELETE data",
+				"errors":  []string{err.Error()},
+				"data":    nil,
+			})
+		}
+
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to DELETE data",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  true,
+		"message": "Succeed to DELETE data",
+		"errors":  nil,
+		"data":    nil,
 	})
 }
