@@ -1,0 +1,11 @@
+package repository
+
+import (
+	"context"
+
+	"github.com/hamasfaa/project-evermos/entity"
+)
+
+type AlamatRepository interface {
+	Create(ctx context.Context, alamatData *entity.Alamat) error
+}
