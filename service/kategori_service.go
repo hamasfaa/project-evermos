@@ -12,4 +12,5 @@ type KategoriService interface {
 	GetAllKategori(ctx context.Context) ([]model.KategoriResponse, error)
 	GetKategoriByID(ctx context.Context, id int) (*model.KategoriResponse, error)
 	DeleteKategori(ctx context.Context, id int) error
+	UpdateKategori(ctx context.Context, kategori *entity.Kategori, id int) error
 }

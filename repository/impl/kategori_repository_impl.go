@@ -52,3 +52,14 @@ func (kategoriRepository *kategoriRepositoryImpl) DeleteKategori(ctx context.Con
 	}
 	return nil
 }
+
+func (kategoriRepository *kategoriRepositoryImpl) UpdateKategori(ctx context.Context, kategori *entity.Kategori, id int) error {
+	result := kategoriRepository.DB.WithContext(ctx).Model(&entity.Kategori{}).Where("id = ?", id).Updates(kategori)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
