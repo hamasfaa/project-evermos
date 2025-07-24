@@ -20,6 +20,7 @@ type KategoriController struct {
 
 func (controller KategoriController) Route(app *fiber.App) {
 	app.Post("/api/v1/category", middleware.AuthenticateJWT(true, controller.Config), controller.CreateKategori)
+	app.Get("/api/v1/category", middleware.AuthenticateJWT(false, controller.Config), controller.GetAllKategori)
 }
 
 func (controller KategoriController) CreateKategori(c *fiber.Ctx) error {
@@ -51,5 +52,24 @@ func (controller KategoriController) CreateKategori(c *fiber.Ctx) error {
 		"message": "Succeed to POST data",
 		"errors":  nil,
 		"data":    kategoriData,
+	})
+}
+
+func (controller KategoriController) GetAllKategori(c *fiber.Ctx) error {
+	kategoriModels, err := controller.kategoriService.GetAllKategori(c.Context())
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to GET data",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  true,
+		"message": "Succeed to GET data",
+		"errors":  nil,
+		"data":    kategoriModels,
 	})
 }

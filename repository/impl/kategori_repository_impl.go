@@ -23,3 +23,12 @@ func (kategoriRepository *kategoriRepositoryImpl) CreateKategori(ctx context.Con
 	}
 	return nil
 }
+
+func (kategoriRepository *kategoriRepositoryImpl) GetAllKategori(ctx context.Context) ([]entity.Kategori, error) {
+	var kategoris []entity.Kategori
+	err := kategoriRepository.DB.WithContext(ctx).Find(&kategoris).Error
+	if err != nil {
+		return nil, err
+	}
+	return kategoris, nil
+}

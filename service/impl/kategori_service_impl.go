@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/hamasfaa/project-evermos/entity"
+	"github.com/hamasfaa/project-evermos/model"
 	"github.com/hamasfaa/project-evermos/repository"
 	"github.com/hamasfaa/project-evermos/service"
 )
@@ -22,4 +23,21 @@ func (service *kategoriServiceImpl) CreateKategori(ctx context.Context, kategori
 		return err
 	}
 	return nil
+}
+
+func (service *kategoriServiceImpl) GetAllKategori(ctx context.Context) ([]model.KategoriResponse, error) {
+	kategoris, err := service.KategoriRepository.GetAllKategori(ctx)
+
+	var kategoriModels []model.KategoriResponse
+	for _, kategori := range kategoris {
+		kategoriModels = append(kategoriModels, model.KategoriResponse{
+			ID:           kategori.ID,
+			NamaKategori: kategori.NamaKategori,
+		})
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	return kategoriModels, nil
 }
