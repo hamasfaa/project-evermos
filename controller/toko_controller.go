@@ -62,7 +62,7 @@ func (controller TokoController) GetTokoByID(c *fiber.Ctx) error {
 	if tokoIDstr == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  false,
-			"message": "Bad Request",
+			"message": "Failed to GET data",
 			"errors":  []string{"Toko ID is required"},
 			"data":    nil,
 		})
@@ -71,7 +71,7 @@ func (controller TokoController) GetTokoByID(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  false,
-			"message": "Bad Request",
+			"message": "Failed to GET data",
 			"errors":  []string{"Invalid Toko ID format"},
 			"data":    nil,
 		})
@@ -153,7 +153,7 @@ func (controller TokoController) UpdateToko(c *fiber.Ctx) error {
 	if tokoIDstr == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  false,
-			"message": "Bad Request",
+			"message": "Failed to PUT data",
 			"errors":  []string{"Toko ID is required"},
 			"data":    nil,
 		})
@@ -162,7 +162,7 @@ func (controller TokoController) UpdateToko(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  false,
-			"message": "Bad Request",
+			"message": "Failed to PUT data",
 			"errors":  []string{"Invalid Toko ID format"},
 			"data":    nil,
 		})
@@ -172,7 +172,7 @@ func (controller TokoController) UpdateToko(c *fiber.Ctx) error {
 	if namaToko == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  false,
-			"message": "Bad Request",
+			"message": "Failed to PUT data",
 			"errors":  []string{"Nama Toko is required"},
 			"data":    nil,
 		})
@@ -184,7 +184,7 @@ func (controller TokoController) UpdateToko(c *fiber.Ctx) error {
 		if !controller.FileService.ValidateImageType(file.Header.Get("Content-Type")) {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"status":  false,
-				"message": "Bad Request",
+				"message": "Failed to PUT data",
 				"errors":  []string{"Invalid image type. Allowed types: jpeg, jpg, png"},
 				"data":    nil,
 			})
@@ -194,7 +194,7 @@ func (controller TokoController) UpdateToko(c *fiber.Ctx) error {
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"status":  false,
-				"message": "Failed to upload file",
+				"message": "Failed to PUT data",
 				"errors":  []string{err.Error()},
 				"data":    nil,
 			})
@@ -213,14 +213,14 @@ func (controller TokoController) UpdateToko(c *fiber.Ctx) error {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 				"status":  false,
-				"message": "Failed to UPDATE data",
+				"message": "Failed to PUT data",
 				"errors":  []string{"Toko not found"},
 				"data":    nil,
 			})
 		}
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  false,
-			"message": "Failed to UPDATE data",
+			"message": "Failed to PUT data",
 			"errors":  []string{err.Error()},
 			"data":    nil,
 		})
@@ -228,7 +228,7 @@ func (controller TokoController) UpdateToko(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"status":  true,
-		"message": "Succeed to UPDATE data",
+		"message": "Succeed to PUT data",
 		"error":   nil,
 		"data":    "Update toko succeed",
 	})
