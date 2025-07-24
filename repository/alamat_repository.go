@@ -8,4 +8,5 @@ import (
 
 type AlamatRepository interface {
 	Create(ctx context.Context, alamatData *entity.Alamat) error
+	GetAlamatByUserID(ctx context.Context, userID int) ([]entity.Alamat, error)
 }

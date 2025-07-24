@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/hamasfaa/project-evermos/entity"
+	"github.com/hamasfaa/project-evermos/model"
 	"github.com/hamasfaa/project-evermos/repository"
 	"github.com/hamasfaa/project-evermos/service"
 )
@@ -24,4 +25,25 @@ func (service *alamatServiceImpl) Create(ctx context.Context, userID int, alamat
 		return err
 	}
 	return nil
+}
+
+func (service *alamatServiceImpl) GetAlamatByUserID(ctx context.Context, userID int) ([]model.AlamatResponse, error) {
+	alamatList, err := service.AlamatRepository.GetAlamatByUserID(ctx, userID)
+
+	var alamatResponse []model.AlamatResponse
+
+	for _, alamat := range alamatList {
+		alamatResponse = append(alamatResponse, model.AlamatResponse{
+			ID:           alamat.ID,
+			JudulAlamat:  alamat.JudulAlamat,
+			NamaPenerima: alamat.NamaPenerima,
+			NoTelp:       alamat.Notelp,
+			DetailAlamat: alamat.DetailAlamat,
+		})
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	return alamatResponse, nil
 }

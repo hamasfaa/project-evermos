@@ -20,6 +20,7 @@ type AlamatController struct {
 
 func (controller AlamatController) Route(app *fiber.App) {
 	app.Post("/api/v1/user/alamat", middleware.AuthenticateJWT(false, controller.Config), controller.CreateAlamat)
+	app.Get("/api/v1/user/alamat", middleware.AuthenticateJWT(false, controller.Config), controller.GetAlamatByUserID)
 }
 
 func (controller AlamatController) CreateAlamat(c *fiber.Ctx) error {
@@ -55,5 +56,26 @@ func (controller AlamatController) CreateAlamat(c *fiber.Ctx) error {
 		"message": "Succeed to POST data",
 		"errors":  nil,
 		"data":    alamatData,
+	})
+}
+
+func (controller AlamatController) GetAlamatByUserID(c *fiber.Ctx) error {
+	userID := c.Locals("userID").(int)
+
+	alamatList, err := controller.alamatService.GetAlamatByUserID(c.Context(), userID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to GET data",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  true,
+		"message": "Succeed to GET data",
+		"errors":  nil,
+		"data":    alamatList,
 	})
 }

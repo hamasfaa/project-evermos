@@ -24,3 +24,14 @@ func (alamatRepository *alamatRepositoryImpl) Create(ctx context.Context, alamat
 	}
 	return nil
 }
+
+func (alamatRepository *alamatRepositoryImpl) GetAlamatByUserID(ctx context.Context, userID int) ([]entity.Alamat, error) {
+	var alamatList []entity.Alamat
+	err := alamatRepository.DB.WithContext(ctx).Where("id_user = ?", userID).Find(&alamatList).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return alamatList, nil
+}
