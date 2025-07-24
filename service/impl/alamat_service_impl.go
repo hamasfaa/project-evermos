@@ -47,3 +47,20 @@ func (service *alamatServiceImpl) GetAlamatByUserID(ctx context.Context, userID 
 	}
 	return alamatResponse, nil
 }
+
+func (service *alamatServiceImpl) GetAlamatByID(ctx context.Context, id int, userID int) (*model.AlamatResponse, error) {
+	alamat, err := service.AlamatRepository.GetAlamatByID(ctx, id, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	alamatResponse := &model.AlamatResponse{
+		ID:           alamat.ID,
+		JudulAlamat:  alamat.JudulAlamat,
+		NamaPenerima: alamat.NamaPenerima,
+		NoTelp:       alamat.Notelp,
+		DetailAlamat: alamat.DetailAlamat,
+	}
+
+	return alamatResponse, nil
+}

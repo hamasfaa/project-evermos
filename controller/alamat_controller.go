@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/hamasfaa/project-evermos/configuration"
 	"github.com/hamasfaa/project-evermos/entity"
@@ -21,6 +23,7 @@ type AlamatController struct {
 func (controller AlamatController) Route(app *fiber.App) {
 	app.Post("/api/v1/user/alamat", middleware.AuthenticateJWT(false, controller.Config), controller.CreateAlamat)
 	app.Get("/api/v1/user/alamat", middleware.AuthenticateJWT(false, controller.Config), controller.GetAlamatByUserID)
+	app.Get("/api/v1/user/alamat/:id", middleware.AuthenticateJWT(false, controller.Config), controller.GetAlamatByID)
 }
 
 func (controller AlamatController) CreateAlamat(c *fiber.Ctx) error {
@@ -77,5 +80,28 @@ func (controller AlamatController) GetAlamatByUserID(c *fiber.Ctx) error {
 		"message": "Succeed to GET data",
 		"errors":  nil,
 		"data":    alamatList,
+	})
+}
+
+func (controller AlamatController) GetAlamatByID(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	id, _ := strconv.Atoi(idStr)
+	userID := c.Locals("userID").(int)
+
+	alamat, err := controller.alamatService.GetAlamatByID(c.Context(), id, userID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to GET data",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  true,
+		"message": "Succeed to GET data",
+		"errors":  nil,
+		"data":    alamat,
 	})
 }

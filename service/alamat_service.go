@@ -10,4 +10,5 @@ import (
 type AlamatService interface {
 	Create(ctx context.Context, userID int, alamatData *entity.Alamat) error
 	GetAlamatByUserID(ctx context.Context, userID int) ([]model.AlamatResponse, error)
+	GetAlamatByID(ctx context.Context, id int, userID int) (*model.AlamatResponse, error)
 }

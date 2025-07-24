@@ -35,3 +35,14 @@ func (alamatRepository *alamatRepositoryImpl) GetAlamatByUserID(ctx context.Cont
 
 	return alamatList, nil
 }
+
+func (alamatRepository *alamatRepositoryImpl) GetAlamatByID(ctx context.Context, id int, userID int) (*entity.Alamat, error) {
+	var alamat entity.Alamat
+	err := alamatRepository.DB.WithContext(ctx).Where("id = ? AND id_user = ?", id, userID).First(&alamat).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &alamat, nil
+}
