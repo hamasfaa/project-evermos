@@ -10,4 +10,5 @@ import (
 type KategoriService interface {
 	CreateKategori(ctx context.Context, kategori *entity.Kategori) error
 	GetAllKategori(ctx context.Context) ([]model.KategoriResponse, error)
+	GetKategoriByID(ctx context.Context, id int) (*model.KategoriResponse, error)
 }

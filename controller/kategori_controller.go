@@ -21,6 +21,7 @@ type KategoriController struct {
 func (controller KategoriController) Route(app *fiber.App) {
 	app.Post("/api/v1/category", middleware.AuthenticateJWT(true, controller.Config), controller.CreateKategori)
 	app.Get("/api/v1/category", middleware.AuthenticateJWT(false, controller.Config), controller.GetAllKategori)
+	app.Get("/api/v1/category/:id_kategori", middleware.AuthenticateJWT(false, controller.Config), controller.GetKategoriByID)
 }
 
 func (controller KategoriController) CreateKategori(c *fiber.Ctx) error {
@@ -71,5 +72,34 @@ func (controller KategoriController) GetAllKategori(c *fiber.Ctx) error {
 		"message": "Succeed to GET data",
 		"errors":  nil,
 		"data":    kategoriModels,
+	})
+}
+
+func (controller KategoriController) GetKategoriByID(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id_kategori")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  false,
+			"message": "Invalid category ID",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	kategoriModel, err := controller.kategoriService.GetKategoriByID(c.Context(), id)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to GET data",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  true,
+		"message": "Succeed to GET data",
+		"errors":  nil,
+		"data":    kategoriModel,
 	})
 }

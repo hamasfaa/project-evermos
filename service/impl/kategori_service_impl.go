@@ -41,3 +41,17 @@ func (service *kategoriServiceImpl) GetAllKategori(ctx context.Context) ([]model
 	}
 	return kategoriModels, nil
 }
+
+func (service *kategoriServiceImpl) GetKategoriByID(ctx context.Context, id int) (*model.KategoriResponse, error) {
+	kategori, err := service.KategoriRepository.GetKategoriByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	kategoriModel := &model.KategoriResponse{
+		ID:           kategori.ID,
+		NamaKategori: kategori.NamaKategori,
+	}
+
+	return kategoriModel, nil
+}

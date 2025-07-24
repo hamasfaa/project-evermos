@@ -32,3 +32,12 @@ func (kategoriRepository *kategoriRepositoryImpl) GetAllKategori(ctx context.Con
 	}
 	return kategoris, nil
 }
+
+func (kategoriRepository *kategoriRepositoryImpl) GetKategoriByID(ctx context.Context, id int) (*entity.Kategori, error) {
+	var kategori entity.Kategori
+	err := kategoriRepository.DB.WithContext(ctx).Where("id = ?", id).First(&kategori).Error
+	if err != nil {
+		return nil, err
+	}
+	return &kategori, nil
+}
