@@ -55,3 +55,11 @@ func (service *kategoriServiceImpl) GetKategoriByID(ctx context.Context, id int)
 
 	return kategoriModel, nil
 }
+
+func (service *kategoriServiceImpl) DeleteKategori(ctx context.Context, id int) error {
+	err := service.KategoriRepository.DeleteKategori(ctx, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -41,3 +41,14 @@ func (kategoriRepository *kategoriRepositoryImpl) GetKategoriByID(ctx context.Co
 	}
 	return &kategori, nil
 }
+
+func (kategoriRepository *kategoriRepositoryImpl) DeleteKategori(ctx context.Context, id int) error {
+	result := kategoriRepository.DB.WithContext(ctx).Where("id = ?", id).Delete(&entity.Kategori{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}

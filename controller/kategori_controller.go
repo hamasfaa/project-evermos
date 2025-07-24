@@ -7,6 +7,7 @@ import (
 	"github.com/hamasfaa/project-evermos/middleware"
 	"github.com/hamasfaa/project-evermos/model"
 	"github.com/hamasfaa/project-evermos/service"
+	"gorm.io/gorm"
 )
 
 func NewKategoriController(kategoriService *service.KategoriService, config configuration.Config) *KategoriController {
@@ -22,6 +23,7 @@ func (controller KategoriController) Route(app *fiber.App) {
 	app.Post("/api/v1/category", middleware.AuthenticateJWT(true, controller.Config), controller.CreateKategori)
 	app.Get("/api/v1/category", middleware.AuthenticateJWT(false, controller.Config), controller.GetAllKategori)
 	app.Get("/api/v1/category/:id_kategori", middleware.AuthenticateJWT(false, controller.Config), controller.GetKategoriByID)
+	app.Delete("/api/v1/category/:id_kategori", middleware.AuthenticateJWT(true, controller.Config), controller.DeleteKategori)
 }
 
 func (controller KategoriController) CreateKategori(c *fiber.Ctx) error {
@@ -101,5 +103,42 @@ func (controller KategoriController) GetKategoriByID(c *fiber.Ctx) error {
 		"message": "Succeed to GET data",
 		"errors":  nil,
 		"data":    kategoriModel,
+	})
+}
+
+func (controller KategoriController) DeleteKategori(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id_kategori")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  false,
+			"message": "Invalid category ID",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	if err := controller.kategoriService.DeleteKategori(c.Context(), id); err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"status":  false,
+				"message": "Failed to DELETE data",
+				"errors":  []string{err.Error()},
+				"data":    nil,
+			})
+		}
+
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to DELETE data",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  true,
+		"message": "Succeed to DELETE data",
+		"errors":  nil,
+		"data":    nil,
 	})
 }
