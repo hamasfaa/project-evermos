@@ -1,0 +1,25 @@
+package impl
+
+import (
+	"context"
+
+	"github.com/hamasfaa/project-evermos/entity"
+	"github.com/hamasfaa/project-evermos/repository"
+	"gorm.io/gorm"
+)
+
+func NewKategoriRepositoryImpl(DB *gorm.DB) repository.KategoriRepository {
+	return &kategoriRepositoryImpl{DB: DB}
+}
+
+type kategoriRepositoryImpl struct {
+	DB *gorm.DB
+}
+
+func (kategoriRepository *kategoriRepositoryImpl) CreateKategori(ctx context.Context, kategori *entity.Kategori) error {
+	err := kategoriRepository.DB.WithContext(ctx).Create(kategori).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}

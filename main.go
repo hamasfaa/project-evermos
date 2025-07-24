@@ -20,11 +20,13 @@ func main() {
 	userRepository := repository.NewUserRepositoryImpl(database)
 	tokoRepository := repository.NewTokoRepositoryImpl(database)
 	alamatRepository := repository.NewAlamatRepositoryImpl(database)
+	katgoriRepository := repository.NewKategoriRepositoryImpl(database)
 
 	// service
 	userService := service.NewUserServiceImpl(&userRepository, &tokoRepository)
 	tokoService := service.NewTokoServiceImpl(&tokoRepository)
 	alamatService := service.NewAlamatServiceImpl(&alamatRepository)
+	kategoriService := service.NewKategoriServiceImpl(&katgoriRepository)
 	locationService := service.NewLocationServiceImpl()
 	fileService := service.NewFileServiceImpl()
 
@@ -32,6 +34,7 @@ func main() {
 	userController := controller.NewUserController(&userService, &locationService, config)
 	tokoController := controller.NewTokoController(&tokoService, &fileService, config)
 	alamatController := controller.NewAlamatController(&alamatService, config)
+	kategoriController := controller.NewKategoriController(&kategoriService, config)
 	locationController := controller.NewLocationController(&locationService, config)
 
 	//setup fiber
@@ -42,6 +45,7 @@ func main() {
 	userController.Route(app)
 	tokoController.Route(app)
 	alamatController.Route(app)
+	kategoriController.Route(app)
 	locationController.Route(app)
 
 	// start app
