@@ -27,9 +27,10 @@ func AuthenticateJWT(requireAdmin bool, config configuration.Config) func(*fiber
 
 			if requireAdmin && !isAdmin {
 				return ctx.Status(fiber.StatusUnauthorized).JSON(model.GeneralResponse{
-					Code:    401,
-					Message: "Unauthorized",
-					Data:    "Admin only access",
+					Status:  false,
+					Message: "Failed to POST data",
+					Errors:  []string{"Unauthorized"},
+					Data:    nil,
 				})
 			}
 
@@ -38,15 +39,17 @@ func AuthenticateJWT(requireAdmin bool, config configuration.Config) func(*fiber
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
 			if err.Error() == "Missing or malformed JWT" {
 				return c.Status(fiber.StatusBadRequest).JSON(model.GeneralResponse{
-					Code:    400,
-					Message: "Bad Request",
-					Data:    "Missing or malformed JWT",
+					Status:  false,
+					Message: "Failed to POST data",
+					Errors:  []string{"Missing or malformed JWT"},
+					Data:    nil,
 				})
 			} else {
 				return c.Status(fiber.StatusUnauthorized).JSON(model.GeneralResponse{
-					Code:    401,
-					Message: "Unauthorized",
-					Data:    "Invalid or expired JWT",
+					Status:  false,
+					Message: "Failed to POST data",
+					Errors:  []string{"Expired or invalid JWT"},
+					Data:    nil,
 				})
 			}
 		},

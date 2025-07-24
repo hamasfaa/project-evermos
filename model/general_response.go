@@ -1,7 +1,8 @@
 package model
 
 type GeneralResponse struct {
-	Code    int         `json:"code"`
+	Status  bool        `json:"status"`
+	Errors  interface{} `json:"errors"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
 }

@@ -16,33 +16,37 @@ func ErrorHandler(ctx *fiber.Ctx, err error) error {
 		errJson := json.Unmarshal([]byte(data), &messages)
 		PanicLogging(errJson)
 		return ctx.Status(fiber.StatusBadRequest).JSON(model.GeneralResponse{
-			Code:    400,
+			Status:  false,
 			Message: "Bad Request",
-			Data:    messages,
+			Errors:  messages,
+			Data:    nil,
 		})
 	}
 
 	_, notFoundError := err.(NotFoundError)
 	if notFoundError {
 		return ctx.Status(fiber.StatusNotFound).JSON(model.GeneralResponse{
-			Code:    404,
+			Status:  false,
 			Message: "Not Found",
-			Data:    err.Error(),
+			Errors:  []string{err.Error()},
+			Data:    nil,
 		})
 	}
 
 	_, unauthorizedError := err.(UnauthorizedError)
 	if unauthorizedError {
 		return ctx.Status(fiber.StatusUnauthorized).JSON(model.GeneralResponse{
-			Code:    401,
+			Status:  false,
 			Message: "Unauthorized",
-			Data:    err.Error(),
+			Errors:  []string{err.Error()},
+			Data:    nil,
 		})
 	}
 
 	return ctx.Status(fiber.StatusInternalServerError).JSON(model.GeneralResponse{
-		Code:    500,
-		Message: "General Error",
-		Data:    err.Error(),
+		Status:  false,
+		Message: "Internal Server Error",
+		Errors:  []string{err.Error()},
+		Data:    nil,
 	})
 }
