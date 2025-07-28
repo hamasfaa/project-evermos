@@ -20,13 +20,13 @@ func main() {
 	userRepository := repository.NewUserRepositoryImpl(database)
 	tokoRepository := repository.NewTokoRepositoryImpl(database)
 	alamatRepository := repository.NewAlamatRepositoryImpl(database)
-	katgoriRepository := repository.NewKategoriRepositoryImpl(database)
+	kategoriRepository := repository.NewKategoriRepositoryImpl(database)
 
 	// service
 	userService := service.NewUserServiceImpl(&userRepository, &tokoRepository)
 	tokoService := service.NewTokoServiceImpl(&tokoRepository)
 	alamatService := service.NewAlamatServiceImpl(&alamatRepository)
-	kategoriService := service.NewKategoriServiceImpl(&katgoriRepository)
+	kategoriService := service.NewKategoriServiceImpl(&kategoriRepository)
 	locationService := service.NewLocationServiceImpl()
 	fileService := service.NewFileServiceImpl()
 
