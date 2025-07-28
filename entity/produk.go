@@ -19,5 +19,5 @@ type Produk struct {
 	Toko        Toko         `gorm:"foreignKey:TokoID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	LogProduk   *LogProduk   `gorm:"foreignKey:ProdukID;references:ID;"`
 	FotoProduks []FotoProduk `gorm:"foreignKey:ProdukID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Kategori    Kategori     `gorm:"foreignKey:KategoriID;references:ID;"`
+	Kategori    Kategori     `gorm:"foreignKey:KategoriID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
