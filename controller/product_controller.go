@@ -22,6 +22,7 @@ type ProductController struct {
 
 func (controller ProductController) Route(app *fiber.App) {
 	app.Post("/api/v1/product", middleware.AuthenticateJWT(false, controller.Config), controller.CreateProduct)
+	app.Get("/api/v1/product", middleware.AuthenticateJWT(false, controller.Config), controller.GetAllProducts)
 }
 
 func (controller ProductController) CreateProduct(c *fiber.Ctx) error {
@@ -89,6 +90,8 @@ func (controller ProductController) CreateProduct(c *fiber.Ctx) error {
 		})
 	}
 
+	slug := c.FormValue("slug")
+
 	var photoUrls []string
 	photos, err := c.MultipartForm()
 	if err != nil {
@@ -140,6 +143,7 @@ func (controller ProductController) CreateProduct(c *fiber.Ctx) error {
 		Stok:          stok,
 		Deskripsi:     deskripsi,
 		Url:           photoUrls,
+		Slug:          slug,
 	}
 
 	if err := controller.ProductService.CreateProduct(c.Context(), userID, &createData); err != nil {
@@ -156,5 +160,58 @@ func (controller ProductController) CreateProduct(c *fiber.Ctx) error {
 		"message": "Succeed to POST data",
 		"errors":  nil,
 		"data":    nil,
+	})
+}
+
+func (controller ProductController) GetAllProducts(c *fiber.Ctx) error {
+	pageStr := c.Query("page", "1")
+	limitStr := c.Query("limit", "10")
+	namaProduk := c.Query("nama_produk", "")
+	kategoriIDStr := c.Query("category_id", "")
+	tokoIDStr := c.Query("toko_id", "")
+	maxHarga := c.Query("max_harga", "")
+	minHarga := c.Query("min_harga", "")
+
+	page, err := strconv.Atoi(pageStr)
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil || limit < 1 {
+		limit = 10
+	}
+	if limit > 100 {
+		limit = 100
+	}
+
+	kategoriID, _ := strconv.Atoi(kategoriIDStr)
+	tokoID, _ := strconv.Atoi(tokoIDStr)
+
+	filterRequest := model.FilterProdukModel{
+		Page:       page,
+		Limit:      limit,
+		Nama:       namaProduk,
+		KategoriID: kategoriID,
+		TokoID:     tokoID,
+		MaxHarga:   maxHarga,
+		MinHarga:   minHarga,
+	}
+
+	products, err := controller.ProductService.GetAllProducts(c.Context(), filterRequest)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to GET data",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  true,
+		"message": "Succeed to GET data",
+		"errors":  nil,
+		"data":    products,
 	})
 }
