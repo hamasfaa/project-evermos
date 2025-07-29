@@ -23,6 +23,7 @@ type ProductController struct {
 func (controller ProductController) Route(app *fiber.App) {
 	app.Post("/api/v1/product", middleware.AuthenticateJWT(false, controller.Config), controller.CreateProduct)
 	app.Get("/api/v1/product", middleware.AuthenticateJWT(false, controller.Config), controller.GetAllProducts)
+	app.Get("/api/v1/product/:id", middleware.AuthenticateJWT(false, controller.Config), controller.GetProductByID)
 }
 
 func (controller ProductController) CreateProduct(c *fiber.Ctx) error {
@@ -213,5 +214,53 @@ func (controller ProductController) GetAllProducts(c *fiber.Ctx) error {
 		"message": "Succeed to GET data",
 		"errors":  nil,
 		"data":    products,
+	})
+}
+
+func (controller ProductController) GetProductByID(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	if idStr == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  false,
+			"message": "Product ID is required",
+			"errors":  []string{"Product ID tidak boleh kosong"},
+			"data":    nil,
+		})
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id <= 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  false,
+			"message": "Invalid Product ID",
+			"errors":  []string{"Product ID harus berupa angka positif"},
+			"data":    nil,
+		})
+	}
+
+	product, err := controller.ProductService.GetProductByID(c.Context(), id)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to GET product",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	if product == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"status":  false,
+			"message": "Product not found",
+			"errors":  []string{"Produk tidak ditemukan"},
+			"data":    nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  true,
+		"message": "Succeed to GET product",
+		"errors":  nil,
+		"data":    product,
 	})
 }

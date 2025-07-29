@@ -96,3 +96,34 @@ func (service *productServiceImpl) GetAllProducts(ctx context.Context, paginatio
 	}
 	return result, nil
 }
+
+func (service *productServiceImpl) GetProductByID(ctx context.Context, id int) (*model.Produk, error) {
+	product, err := service.ProductRepository.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	var fotoResponses []model.FotoProdukResponse
+	for _, foto := range product.FotoProduks {
+		fotoResponses = append(fotoResponses, model.FotoProdukResponse{
+			ID:       foto.ID,
+			ProdukID: foto.ProdukID,
+			Url:      foto.Url,
+		})
+	}
+
+	result := &model.Produk{
+		ID:            product.ID,
+		NamaProduk:    product.NamaProduk,
+		Slug:          product.Slug,
+		HargaReseller: product.HargaReseller,
+		HargaKonsumen: product.HargaKonsumen,
+		Stok:          product.Stok,
+		Deskripsi:     product.Deskripsi,
+		Toko:          model.TokoModel{ID: product.Toko.ID, NamaToko: product.Toko.NamaToko, UrlFoto: product.Toko.UrlFoto},
+		Kategori:      model.KategoriResponse{ID: product.Kategori.ID, NamaKategori: product.Kategori.NamaKategori},
+		Foto:          fotoResponses,
+	}
+
+	return result, nil
+}

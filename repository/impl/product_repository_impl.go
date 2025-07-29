@@ -70,3 +70,14 @@ func (repo *productRepositoryImpl) GetAll(ctx context.Context, offset, limit int
 
 	return products, total, nil
 }
+
+func (repo *productRepositoryImpl) GetByID(ctx context.Context, id int) (*entity.Produk, error) {
+	var product entity.Produk
+	err := repo.DB.WithContext(ctx).Preload("Toko").Preload("Kategori").Preload("FotoProduks").First(&product, id).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &product, nil
+}
