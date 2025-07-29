@@ -11,4 +11,5 @@ type ProductService interface {
 	GetAllProducts(ctx context.Context, pagination model.FilterProdukModel) (*model.AllProduk, error)
 	GetProductByID(ctx context.Context, id int) (*model.Produk, error)
 	DeleteProduct(ctx context.Context, id int) error
+	UpdateProduct(ctx context.Context, id int, productData *model.CreateProduct) error
 }

@@ -12,4 +12,5 @@ type ProductRepository interface {
 	GetAll(ctx context.Context, offset, limit int, nama string, kategoriID, tokoID int, maxHarga, minHarga string) ([]*entity.Produk, int64, error)
 	GetByID(ctx context.Context, id int) (*entity.Produk, error)
 	Delete(ctx context.Context, id int) error
+	Update(ctx context.Context, id int, productData *entity.Produk) error
 }

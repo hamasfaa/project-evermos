@@ -26,6 +26,7 @@ func (controller ProductController) Route(app *fiber.App) {
 	app.Get("/api/v1/product", middleware.AuthenticateJWT(false, controller.Config), controller.GetAllProducts)
 	app.Get("/api/v1/product/:id", middleware.AuthenticateJWT(false, controller.Config), controller.GetProductByID)
 	app.Delete("/api/v1/product/:id", middleware.AuthenticateJWT(false, controller.Config), controller.DeleteProduct)
+	app.Put("/api/v1/product/:id", middleware.AuthenticateJWT(false, controller.Config), controller.UpdateProduct)
 }
 
 func (controller ProductController) CreateProduct(c *fiber.Ctx) error {
@@ -308,6 +309,163 @@ func (controller ProductController) DeleteProduct(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"status":  true,
 		"message": "Succeed to DELETE product",
+		"errors":  nil,
+		"data":    nil,
+	})
+}
+
+func (controller ProductController) UpdateProduct(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	if idStr == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  false,
+			"message": "Product ID is required",
+			"errors":  []string{"Product ID tidak boleh kosong"},
+			"data":    nil,
+		})
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id <= 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  false,
+			"message": "Invalid Product ID",
+			"errors":  []string{"Product ID harus berupa angka positif"},
+			"data":    nil,
+		})
+	}
+
+	namaProduk := c.FormValue("nama_produk")
+	if namaProduk == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to UPDATE product",
+			"errors":  []string{"Nama produk tidak boleh kosong"},
+			"data":    nil,
+		})
+	}
+
+	kategoriIDStr := c.FormValue("category_id")
+	if kategoriIDStr == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to UPDATE product",
+			"errors":  []string{"Category ID tidak boleh kosong"},
+			"data":    nil,
+		})
+	}
+
+	kategoriID, _ := strconv.Atoi(kategoriIDStr)
+	hargaReseller := c.FormValue("harga_reseller")
+	if hargaReseller == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to UPDATE product",
+			"errors":  []string{"Harga reseller tidak boleh kosong"},
+			"data":    nil,
+		})
+	}
+
+	hargaKonsumen := c.FormValue("harga_konsumen")
+	if hargaKonsumen == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to UPDATE product",
+			"errors":  []string{"Harga konsumen tidak boleh kosong"},
+			"data":    nil,
+		})
+	}
+
+	stokStr := c.FormValue("stok")
+	if stokStr == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to UPDATE product",
+			"errors":  []string{"Stok tidak boleh kosong"},
+			"data":    nil,
+		})
+	}
+	stok, _ := strconv.Atoi(stokStr)
+
+	deskripsi := c.FormValue("deskripsi")
+	if deskripsi == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to UPDATE product",
+			"errors":  []string{"Deskripsi tidak boleh kosong"},
+			"data":    nil,
+		})
+	}
+
+	slug := c.FormValue("slug")
+
+	var photoUrls []string
+	photos, err := c.MultipartForm()
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to UPDATE product",
+			"errors":  []string{"Gagal membaca file upload"},
+			"data":    nil,
+		})
+	}
+
+	files := photos.File["photos"]
+	if len(files) > 0 {
+		for _, file := range files {
+			if !controller.FileService.ValidateImageType(file.Header.Get("Content-Type")) {
+				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+					"status":  false,
+					"message": "Failed to UPDATE product",
+					"errors":  []string{"Tipe file tidak valid"},
+					"data":    nil,
+				})
+			}
+
+			url, err := controller.FileService.UploadImage(file, "./uploads/produk")
+			if err != nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+					"status":  false,
+					"message": "Failed to UPDATE product",
+					"errors":  []string{err.Error()},
+					"data":    nil,
+				})
+			}
+			photoUrls = append(photoUrls, url)
+		}
+	}
+
+	updateData := model.CreateProduct{
+		Name:          namaProduk,
+		KategoriID:    kategoriID,
+		HargaReseller: hargaReseller,
+		HargaKonsumen: hargaKonsumen,
+		Stok:          stok,
+		Deskripsi:     deskripsi,
+		Url:           photoUrls,
+		Slug:          slug,
+	}
+
+	if err := controller.ProductService.UpdateProduct(c.Context(), id, &updateData); err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"status":  false,
+				"message": "Failed to UPDATE product",
+				"errors":  []string{"Produk tidak ditemukan"},
+				"data":    nil,
+			})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to UPDATE product",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  true,
+		"message": "Succeed to UPDATE product",
 		"errors":  nil,
 		"data":    nil,
 	})

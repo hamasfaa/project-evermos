@@ -134,3 +134,28 @@ func (service *productServiceImpl) DeleteProduct(ctx context.Context, id int) er
 	}
 	return nil
 }
+
+func (service *productServiceImpl) UpdateProduct(ctx context.Context, id int, productData *model.CreateProduct) error {
+	product := &entity.Produk{
+		ID:            id,
+		NamaProduk:    productData.Name,
+		HargaReseller: productData.HargaReseller,
+		HargaKonsumen: productData.HargaKonsumen,
+		Stok:          productData.Stok,
+		Deskripsi:     productData.Deskripsi,
+		KategoriID:    productData.KategoriID,
+		Slug:          productData.Slug,
+	}
+
+	if err := service.ProductRepository.Update(ctx, id, product); err != nil {
+		return err
+	}
+
+	if len(productData.Url) > 0 {
+		if err := service.ProductRepository.CreateFoto(ctx, id, productData.Url); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

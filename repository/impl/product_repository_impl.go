@@ -93,3 +93,15 @@ func (repo *productRepositoryImpl) Delete(ctx context.Context, id int) error {
 	}
 	return nil
 }
+
+func (repo *productRepositoryImpl) Update(ctx context.Context, id int, productData *entity.Produk) error {
+	result := repo.DB.WithContext(ctx).Model(&entity.Produk{}).Where("id = ?", id).Updates(productData)
+
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
