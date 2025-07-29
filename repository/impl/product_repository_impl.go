@@ -81,3 +81,15 @@ func (repo *productRepositoryImpl) GetByID(ctx context.Context, id int) (*entity
 
 	return &product, nil
 }
+
+func (repo *productRepositoryImpl) Delete(ctx context.Context, id int) error {
+	result := repo.DB.WithContext(ctx).Where("id = ?", id).Delete(&entity.Produk{})
+
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}

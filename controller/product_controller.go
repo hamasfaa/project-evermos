@@ -8,6 +8,7 @@ import (
 	"github.com/hamasfaa/project-evermos/middleware"
 	"github.com/hamasfaa/project-evermos/model"
 	"github.com/hamasfaa/project-evermos/service"
+	"gorm.io/gorm"
 )
 
 func NewProductController(productService *service.ProductService, fileService *service.FileService, config configuration.Config) *ProductController {
@@ -24,6 +25,7 @@ func (controller ProductController) Route(app *fiber.App) {
 	app.Post("/api/v1/product", middleware.AuthenticateJWT(false, controller.Config), controller.CreateProduct)
 	app.Get("/api/v1/product", middleware.AuthenticateJWT(false, controller.Config), controller.GetAllProducts)
 	app.Get("/api/v1/product/:id", middleware.AuthenticateJWT(false, controller.Config), controller.GetProductByID)
+	app.Delete("/api/v1/product/:id", middleware.AuthenticateJWT(false, controller.Config), controller.DeleteProduct)
 }
 
 func (controller ProductController) CreateProduct(c *fiber.Ctx) error {
@@ -262,5 +264,51 @@ func (controller ProductController) GetProductByID(c *fiber.Ctx) error {
 		"message": "Succeed to GET product",
 		"errors":  nil,
 		"data":    product,
+	})
+}
+
+func (controller ProductController) DeleteProduct(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	if idStr == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  false,
+			"message": "Product ID is required",
+			"errors":  []string{"Product ID tidak boleh kosong"},
+			"data":    nil,
+		})
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id <= 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  false,
+			"message": "Invalid Product ID",
+			"errors":  []string{"Product ID harus berupa angka positif"},
+			"data":    nil,
+		})
+	}
+
+	if err := controller.ProductService.DeleteProduct(c.Context(), id); err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"status":  false,
+				"message": "Product not found",
+				"errors":  []string{"Produk tidak ditemukan"},
+				"data":    nil,
+			})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to DELETE product",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  true,
+		"message": "Succeed to DELETE product",
+		"errors":  nil,
+		"data":    nil,
 	})
 }

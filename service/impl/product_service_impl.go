@@ -127,3 +127,10 @@ func (service *productServiceImpl) GetProductByID(ctx context.Context, id int) (
 
 	return result, nil
 }
+
+func (service *productServiceImpl) DeleteProduct(ctx context.Context, id int) error {
+	if err := service.ProductRepository.Delete(ctx, id); err != nil {
+		return err
+	}
+	return nil
+}
