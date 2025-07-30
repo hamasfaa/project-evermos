@@ -105,3 +105,15 @@ func (repo *productRepositoryImpl) Update(ctx context.Context, id int, productDa
 	}
 	return nil
 }
+
+func (repo *productRepositoryImpl) UpdateStock(ctx context.Context, id int, stok int) error {
+	result := repo.DB.WithContext(ctx).Model(&entity.Produk{}).Where("id = ?", id).Update("stok", stok)
+
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}

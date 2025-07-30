@@ -30,7 +30,7 @@ func main() {
 	alamatService := service.NewAlamatServiceImpl(&alamatRepository)
 	kategoriService := service.NewKategoriServiceImpl(&kategoriRepository)
 	productService := service.NewProductServiceImpl(&productRepository, &tokoRepository)
-	trxService := service.NewTrxServiceImpl(&trxRepository)
+	trxService := service.NewTrxServiceImpl(&trxRepository, &productRepository)
 	locationService := service.NewLocationServiceImpl()
 	fileService := service.NewFileServiceImpl()
 
