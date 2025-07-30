@@ -40,3 +40,12 @@ func (repo *trxRepositoryImpl) GetTransactionsByUserID(ctx context.Context, user
 	}
 	return transactions, nil
 }
+
+func (repo *trxRepositoryImpl) GetByID(ctx context.Context, id int) (*entity.Trx, error) {
+	var transaction entity.Trx
+	err := repo.DB.WithContext(ctx).Where("id = ?", id).Preload("User").Preload("Alamat").Preload("DetailTrx").Preload("DetailTrx.Produk").Preload("DetailTrx.Produk.Toko").Preload("DetailTrx.Produk.Kategori").Preload("DetailTrx.Produk.FotoProduks").First(&transaction).Error
+	if err != nil {
+		return nil, err
+	}
+	return &transaction, nil
+}

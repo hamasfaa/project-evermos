@@ -155,3 +155,60 @@ func (s *trxServiceImpl) GetTransactionsByUserID(ctx context.Context, userID int
 
 	return result, nil
 }
+
+func (s *trxServiceImpl) GetTransactionByID(ctx context.Context, id int) (*model.Trx, error) {
+	transaction, err := s.TrxRepository.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	var details []model.TrxDetail
+	for _, detail := range transaction.DetailTrx {
+		var fotoResponses []model.FotoProdukResponse
+		for _, foto := range detail.Produk.FotoProduks {
+			fotoResponses = append(fotoResponses, model.FotoProdukResponse{
+				ID:       foto.ID,
+				ProdukID: foto.ProdukID,
+				Url:      foto.Url,
+			})
+		}
+		details = append(details, model.TrxDetail{
+			Produk: model.Produk{
+				ID:            detail.Produk.ID,
+				NamaProduk:    detail.Produk.NamaProduk,
+				Slug:          detail.Produk.Slug,
+				HargaReseller: detail.Produk.HargaReseller,
+				HargaKonsumen: detail.Produk.HargaKonsumen,
+				Deskripsi:     detail.Produk.Deskripsi,
+				Toko: model.TokoModel{
+					NamaToko: detail.Produk.Toko.NamaToko,
+					UrlFoto:  detail.Produk.Toko.UrlFoto,
+				},
+				Kategori: model.KategoriResponse{
+					ID:           detail.Produk.Kategori.ID,
+					NamaKategori: detail.Produk.Kategori.NamaKategori,
+				},
+				Foto: fotoResponses,
+			},
+			Kuantitas:  detail.Kuantitas,
+			HargaTotal: strconv.Itoa(detail.HargaTotal),
+		})
+	}
+
+	result := &model.Trx{
+		ID:         transaction.ID,
+		HargaTotal: transaction.HargaTotal,
+		Kode:       transaction.Kode,
+		Metode:     transaction.Metode,
+		Alamat: model.AlamatResponse{
+			ID:           transaction.Alamat.ID,
+			JudulAlamat:  transaction.Alamat.JudulAlamat,
+			NamaPenerima: transaction.Alamat.NamaPenerima,
+			NoTelp:       transaction.Alamat.Notelp,
+			DetailAlamat: transaction.Alamat.DetailAlamat,
+		},
+		Detail: details,
+	}
+
+	return result, nil
+}

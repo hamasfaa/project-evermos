@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/hamasfaa/project-evermos/configuration"
 	"github.com/hamasfaa/project-evermos/middleware"
@@ -20,6 +22,7 @@ type TrxContoller struct {
 func (controller TrxContoller) Route(app *fiber.App) {
 	app.Post("/api/v1/trx", middleware.AuthenticateJWT(false, controller.Config), controller.CreateTransaction)
 	app.Get("/api/v1/trx", middleware.AuthenticateJWT(false, controller.Config), controller.GetTransactionsByUserID)
+	app.Get("/api/v1/trx/:id", middleware.AuthenticateJWT(false, controller.Config), controller.GetTransactionByID)
 }
 
 func (controller TrxContoller) CreateTransaction(c *fiber.Ctx) error {
@@ -70,5 +73,35 @@ func (controller TrxContoller) GetTransactionsByUserID(c *fiber.Ctx) error {
 		"message": "Succeed to GET data",
 		"errors":  nil,
 		"data":    transactions,
+	})
+}
+
+func (controller TrxContoller) GetTransactionByID(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	if idStr == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  false,
+			"message": "Transaction ID is required",
+			"errors":  []string{"Transaction ID is required"},
+			"data":    nil,
+		})
+	}
+	id, _ := strconv.Atoi(idStr)
+
+	transaction, err := controller.TrxService.GetTransactionByID(c.Context(), id)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  false,
+			"message": "Failed to GET data",
+			"errors":  []string{err.Error()},
+			"data":    nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  true,
+		"message": "Succeed to GET data",
+		"errors":  nil,
+		"data":    transaction,
 	})
 }
