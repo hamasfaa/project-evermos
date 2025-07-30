@@ -22,6 +22,7 @@ func main() {
 	alamatRepository := repository.NewAlamatRepositoryImpl(database)
 	kategoriRepository := repository.NewKategoriRepositoryImpl(database)
 	productRepository := repository.NewProductRepositoryImpl(database)
+	trxRepository := repository.NewTrxRepository(database)
 
 	// service
 	userService := service.NewUserServiceImpl(&userRepository, &tokoRepository)
@@ -29,6 +30,7 @@ func main() {
 	alamatService := service.NewAlamatServiceImpl(&alamatRepository)
 	kategoriService := service.NewKategoriServiceImpl(&kategoriRepository)
 	productService := service.NewProductServiceImpl(&productRepository, &tokoRepository)
+	trxService := service.NewTrxServiceImpl(&trxRepository)
 	locationService := service.NewLocationServiceImpl()
 	fileService := service.NewFileServiceImpl()
 
@@ -39,6 +41,7 @@ func main() {
 	kategoriController := controller.NewKategoriController(&kategoriService, config)
 	locationController := controller.NewLocationController(&locationService, config)
 	productController := controller.NewProductController(&productService, &fileService, config)
+	trxController := controller.NewTrxController(&trxService, config)
 
 	//setup fiber
 	app := fiber.New(configuration.NewFiberConfiguration())
@@ -51,6 +54,7 @@ func main() {
 	kategoriController.Route(app)
 	locationController.Route(app)
 	productController.Route(app)
+	trxController.Route(app)
 
 	// start app
 	err := app.Listen(config.Get("SERVER.PORT"))
