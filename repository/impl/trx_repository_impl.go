@@ -31,3 +31,12 @@ func (repo *trxRepositoryImpl) CreateDetailTransaction(ctx context.Context, deta
 	}
 	return len(detail), nil
 }
+
+func (repo *trxRepositoryImpl) GetTransactionsByUserID(ctx context.Context, userID int) ([]entity.Trx, error) {
+	var transactions []entity.Trx
+	err := repo.DB.WithContext(ctx).Where("id_user = ?", userID).Preload("User").Preload("Alamat").Preload("DetailTrx").Preload("DetailTrx.Produk").Preload("DetailTrx.Produk.Toko").Preload("DetailTrx.Produk.Kategori").Preload("DetailTrx.Produk.FotoProduks").Find(&transactions).Error
+	if err != nil {
+		return nil, err
+	}
+	return transactions, nil
+}
