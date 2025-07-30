@@ -20,4 +20,5 @@ type Produk struct {
 	LogProduk   *LogProduk   `gorm:"foreignKey:ProdukID;references:ID;"`
 	FotoProduks []FotoProduk `gorm:"foreignKey:ProdukID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	Kategori    Kategori     `gorm:"foreignKey:KategoriID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	DetailTrxs  []DetailTrx  `gorm:"foreignKey:ProdukID;references:ID"`
 }

@@ -11,8 +11,8 @@ type Toko struct {
 	UpdatedAt time.Time `gorm:"column:updated_at;type:datetime;autoUpdateTime"`
 
 	// Relasi
-	User       User        `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Produks    []Produk    `gorm:"foreignKey:TokoID;references:ID;"`
-	DetailTrxs []Trx       `gorm:"foreignKey:UserID;references:ID;"`
+	User    User     `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Produks []Produk `gorm:"foreignKey:TokoID;references:ID;"`
+	// DetailTrxs []Trx       `gorm:"foreignKey:UserID;references:ID;"`
 	LogProduks []LogProduk `gorm:"foreignKey:TokoID;references:ID;"`
 }
