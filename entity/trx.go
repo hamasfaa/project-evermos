@@ -13,7 +13,7 @@ type Trx struct {
 	UpdatedAt  time.Time `gorm:"column:updated_at;type:datetime;autoUpdateTime"`
 
 	// Relasi
-	User      User       `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Alamat    Alamat     `gorm:"foreignKey:AlamatID;references:ID;"`
-	DetailTrx *DetailTrx `gorm:"foreignKey:TrxID;references:ID;"`
+	User      User        `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Alamat    Alamat      `gorm:"foreignKey:AlamatID;references:ID;"`
+	DetailTrx []DetailTrx `gorm:"foreignKey:TrxID;references:ID;"`
 }
