@@ -56,9 +56,32 @@ func (controller TrxContoller) CreateTransaction(c *fiber.Ctx) error {
 }
 
 func (controller TrxContoller) GetTransactionsByUserID(c *fiber.Ctx) error {
+	pageStr := c.Query("page", "1")
+	limitStr := c.Query("limit", "10")
+	search := c.Query("search", "")
+
+	page, err := strconv.Atoi(pageStr)
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil || limit < 1 {
+		limit = 10
+	}
+	if limit > 100 {
+		limit = 100
+	}
+
+	filterRequest := model.FilterTrxModel{
+		Page:   page,
+		Limit:  limit,
+		Search: search,
+	}
+
 	userID := c.Locals("userID").(int)
 
-	transactions, err := controller.TrxService.GetTransactionsByUserID(c.Context(), userID)
+	transactions, err := controller.TrxService.GetTransactionsByUserID(c.Context(), userID, filterRequest)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  false,

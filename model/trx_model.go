@@ -27,5 +27,11 @@ type TrxDetail struct {
 }
 
 type AllTrx struct {
-	Data interface{} `json:"data"`
+	Data       interface{} `json:"data"`
+	TotalItems int64       `json:"total_items"`
+	TotalPages int         `json:"total_pages"`
+	Page       int         `json:"page"`
+	Limit      int         `json:"limit"`
+	HasNext    bool        `json:"has_next"`
+	HasPrev    bool        `json:"has_prev"`
 }

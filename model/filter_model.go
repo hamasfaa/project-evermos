@@ -15,3 +15,9 @@ type FilterProdukModel struct {
 	MaxHarga   string `query:"max_harga"`
 	MinHarga   string `query:"min_harga"`
 }
+
+type FilterTrxModel struct {
+	Page   int    `query:"page"`
+	Limit  int    `query:"limit"`
+	Search string `query:"search"`
+}

@@ -94,8 +94,10 @@ func (s *trxServiceImpl) CreateTransaction(ctx context.Context, userID int, tran
 	return nil
 }
 
-func (s *trxServiceImpl) GetTransactionsByUserID(ctx context.Context, userID int) (*model.AllTrx, error) {
-	transactions, err := s.TrxRepository.GetTransactionsByUserID(ctx, userID)
+func (s *trxServiceImpl) GetTransactionsByUserID(ctx context.Context, userID int, filterRequest model.FilterTrxModel) (*model.AllTrx, error) {
+	offset := (filterRequest.Page - 1) * filterRequest.Limit
+
+	transactions, total, err := s.TrxRepository.GetTransactionsByUserID(ctx, userID, offset, filterRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -149,8 +151,18 @@ func (s *trxServiceImpl) GetTransactionsByUserID(ctx context.Context, userID int
 		})
 	}
 
+	totalPages := (int(total) + filterRequest.Limit - 1) / filterRequest.Limit
+	hasNext := filterRequest.Page < totalPages
+	hasPrev := filterRequest.Page > 1
+
 	result := &model.AllTrx{
-		Data: trxDetails,
+		Data:       trxDetails,
+		TotalItems: total,
+		TotalPages: totalPages,
+		Page:       filterRequest.Page,
+		Limit:      filterRequest.Limit,
+		HasNext:    hasNext,
+		HasPrev:    hasPrev,
 	}
 
 	return result, nil
