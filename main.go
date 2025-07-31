@@ -23,6 +23,7 @@ func main() {
 	kategoriRepository := repository.NewKategoriRepositoryImpl(database)
 	productRepository := repository.NewProductRepositoryImpl(database)
 	trxRepository := repository.NewTrxRepository(database)
+	logProductRepository := repository.NewLogProductRepository(database)
 
 	// service
 	userService := service.NewUserServiceImpl(&userRepository, &tokoRepository)
@@ -30,7 +31,7 @@ func main() {
 	alamatService := service.NewAlamatServiceImpl(&alamatRepository)
 	kategoriService := service.NewKategoriServiceImpl(&kategoriRepository)
 	productService := service.NewProductServiceImpl(&productRepository, &tokoRepository)
-	trxService := service.NewTrxServiceImpl(&trxRepository, &productRepository)
+	trxService := service.NewTrxServiceImpl(&trxRepository, &productRepository, &logProductRepository)
 	locationService := service.NewLocationServiceImpl()
 	fileService := service.NewFileServiceImpl()
 

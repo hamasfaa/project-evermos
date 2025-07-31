@@ -12,13 +12,14 @@ import (
 	"github.com/hamasfaa/project-evermos/service"
 )
 
-func NewTrxServiceImpl(trxRepository *repository.TrxRepository, productRepository *repository.ProductRepository) service.TrxService {
-	return &trxServiceImpl{TrxRepository: *trxRepository, ProductRepository: *productRepository}
+func NewTrxServiceImpl(trxRepository *repository.TrxRepository, productRepository *repository.ProductRepository, logProductRepository *repository.LogProductRepository) service.TrxService {
+	return &trxServiceImpl{TrxRepository: *trxRepository, ProductRepository: *productRepository, LogProductRepository: *logProductRepository}
 }
 
 type trxServiceImpl struct {
 	repository.TrxRepository
 	repository.ProductRepository
+	repository.LogProductRepository
 }
 
 func (s *trxServiceImpl) CreateTransaction(ctx context.Context, userID int, transaction *model.Transaksi) error {
@@ -77,9 +78,29 @@ func (s *trxServiceImpl) CreateTransaction(ctx context.Context, userID int, tran
 		}
 	}
 
-	_, err = s.TrxRepository.CreateDetailTransaction(ctx, entityTransaction.DetailTrx)
+	IDs, err := s.TrxRepository.CreateDetailTransaction(ctx, entityTransaction.DetailTrx)
 	if err != nil {
 		return err
+	}
+
+	for i, detail := range entityTransaction.DetailTrx {
+		product := productData[detail.ProdukID]
+
+		logProduk := entity.LogProduk{
+			ProdukID:      detail.ProdukID,
+			DetailTrxID:   IDs[i],
+			NamaProduk:    product.NamaProduk,
+			Slug:          product.Slug,
+			HargaReseller: product.HargaReseller,
+			HargaKonsumen: product.HargaKonsumen,
+			Deskripsi:     product.Deskripsi,
+			TokoID:        product.TokoID,
+			KategoriID:    product.KategoriID,
+		}
+
+		if err := s.LogProductRepository.CreateLogProduk(ctx, &logProduk); err != nil {
+			return fmt.Errorf("failed to create log for product %s: %w", product.NamaProduk, err)
+		}
 	}
 
 	for _, detail := range entityTransaction.DetailTrx {

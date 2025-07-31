@@ -25,12 +25,16 @@ func (repo *trxRepositoryImpl) CreateTransaction(ctx context.Context, transactio
 	return transaction.ID, nil
 }
 
-func (repo *trxRepositoryImpl) CreateDetailTransaction(ctx context.Context, detail []entity.DetailTrx) (int, error) {
+func (repo *trxRepositoryImpl) CreateDetailTransaction(ctx context.Context, detail []entity.DetailTrx) ([]int, error) {
 	err := repo.DB.WithContext(ctx).Create(&detail).Error
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-	return len(detail), nil
+	var IDs []int
+	for _, d := range detail {
+		IDs = append(IDs, d.ID)
+	}
+	return IDs, nil
 }
 
 func (repo *trxRepositoryImpl) GetTransactionsByUserID(ctx context.Context, userID int, offset int, filterRequest model.FilterTrxModel) ([]entity.Trx, int64, error) {
